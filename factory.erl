@@ -7,22 +7,24 @@
 % tick: simulation advances one step 
 -export([tick/0,test_call/0]).
 
-% cd ("c:/users/fvia/documents/factory").
+
 
 
 start(Env) -> 
 	% 
-	gen_server:start_link({local,?MODULE},?MODULE,Env,[]).
+	gen_server:start_link({global,?MODULE},?MODULE,Env,[]).
 	%gen_server:start({local,?MODULE},?MODULE,Env,[]).
 
 stop() ->
-	gen_server:cast(?MODULE,stop).
+	gen_server:cast({global,?MODULE},stop).
 
 
 init(Env) -> 
 	io:format("Factory starting~n"),
 	extruder:start({e1,20,0}),
     extruder:start({e2,20,0}),
+    gen_event:start_link({global, gossip_manager}),
+    gen_event:add_handler( {global,gossip_manager}, gossip, []),
 	{ok,Env}.
 
 terminate(Reason,Env) ->
@@ -71,8 +73,8 @@ code_change(_OldVsn, State, _Extra) ->
 
 
 tick() -> 
-	gen_server:cast(?MODULE,tick),
+	gen_server:cast({global,?MODULE},tick),
 	ok.	
 
 test_call() -> 
-	gen_server:call(?MODULE,test_call).		
+	gen_server:call({global,?MODULE},test_call).		

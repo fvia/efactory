@@ -13,10 +13,10 @@
 
 start(Env) -> 
 	{Name,_,_} = Env,	
-	gen_server:start_link({local,Name},?MODULE,Env,[]).
+	gen_server:start_link({global,Name},?MODULE,Env,[]).
 
 stop(Name) ->
-	gen_server:cast(Name,stop).
+	gen_server:cast({global,Name},stop).
 
 
 init(Env) -> 
@@ -39,6 +39,10 @@ handle_call(Message,From,LoopData) ->
 	{reply,Reply,LoopData}.   
 
 
+handle_cast(tick,Env) ->
+	io:format("Extruder tick ,  Env: ~p   ~n",[Env]),
+	gen_event:notify({global,gossip_manager},{extruder,Env}),
+	{noreply,Env};   
 handle_cast(stop,Env) ->
 	io:format("Extruder handle_cast stop ,  Env: ~p   ~n",[Env]),
 	{stop,normal,Env};   
@@ -65,8 +69,8 @@ code_change(_OldVsn, State, _Extra) ->
 
 
 test_call(Name) ->
-	gen_server:call( Name, test_call).
+	gen_server:call( {global,Name}, test_call).
 
 tick(Name) -> 
-	gen_server:cast(Name,tick),
+	gen_server:cast( {global,Name},tick),
 	ok.	
