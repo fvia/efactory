@@ -7,6 +7,7 @@
 % tick: simulation advances one step 
 -export([tick/0,test_call/0]).
 
+-include("factory.hrl").
 
 
 
@@ -21,8 +22,8 @@ stop() ->
 
 init(Env) -> 
 	io:format("Factory starting~n"),
-	extruder:start({e1,20,0,20,100}),
-    extruder:start({e2,20,0,25,100}),
+    extruder:start(#extruderSt{name=e1,temperature=20,speed=0,targetTemperature=20,targetSpeed=100}),
+    extruder:start(#extruderSt{name=e2,temperature=20,speed=0,targetTemperature=25,targetSpeed=100}),
     gen_event:start_link({global, gossip_manager}),
     gen_event:add_handler( {global,gossip_manager}, gossip, []),
 	{ok,Env}.

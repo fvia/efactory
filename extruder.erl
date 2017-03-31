@@ -6,13 +6,14 @@
 
 -export([test_call/1,tick/1]).
 
+-include("factory.hrl").
 
 
 %%%%%%%%%%%%%%% ENV %%%%%%%%%%%%%%%%%%%%
 %%  {extruderName,Temperature,Speed,TargetTemperature,TargetSpeed}
 
 start(Env) -> 
-	{Name,_,_,_,_} = Env,	
+	#extruderSt{name=Name}=Env,
 	gen_server:start_link({global,Name},?MODULE,Env,[]).
 
 stop(Name) ->
@@ -20,7 +21,7 @@ stop(Name) ->
 
 
 init(Env) -> 
-	{Name,_,_,_,_} = Env,	
+	#extruderSt{name=Name}=Env,	
 	io:format("Extruder ~p starting~n",[Name]),	
 	{ok,Env}.
 
@@ -30,7 +31,7 @@ terminate(Reason,Env) ->
 
 
 handle_call(test_call,_From,LoopData) ->
-	{Name,_,_,_,_} = LoopData,
+	#extruderSt{name=Name}= LoopData,
 	io:format("Extruder ~p test_call ~n",[Name]),
 	{reply,ok,LoopData};   
 handle_call(Message,From,LoopData) ->
@@ -40,15 +41,15 @@ handle_call(Message,From,LoopData) ->
 
 
 handle_cast(tick,Env) ->
-	{Name,T0,S0,TT,TS} = Env,
+	#extruderSt{temperature=T0,targetTemperature=TT}= Env,
 	T1 = if 
 		T0 < TT  -> T0+1;
 		true -> T0 
 	end,
-	NewEnv = {Name,T1,S0,TT,TS}, 
+	NewEnv = Env#extruderSt{temperature=T1}, 
 
-	io:format("Extruder tick 0,  Env: ~p   ~n",[Env]),
-	gen_event:notify({global,gossip_manager},{extruder,Env}),
+	io:format("Extruder tick 0,  Env: ~p   ~n",[NewEnv]),
+	gen_event:notify({global,gossip_manager},{extruder,NewEnv}),
 	{noreply,NewEnv};
 handle_cast(stop,Env) ->
 	io:format("Extruder handle_cast stop ,  Env: ~p   ~n",[Env]),

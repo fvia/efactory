@@ -1,3 +1,3 @@
 
 
--record(extruderSt,{ name,temperature,speed}).
+-record(extruderSt,{ name,temperature,speed,targetTemperature,targetSpeed}).
