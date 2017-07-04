@@ -1,2 +1,12 @@
-# efactory
-playing with erlang
+efactory
+==========
+
+Playing with erlang
+
+An OTP application
+
+Build
+-----
+
+    $ rebar3 compile
+
