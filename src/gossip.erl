@@ -12,7 +12,7 @@ terminate(_Reason,_Env) ->
 	ok.
 
 handle_event(Event, State) ->
-	io:format("gossip handle_event: ~p   ~n",[Event]),
+	io:format("gossip handle_event .: ~p   ~n",[Event]),
 	{ok,State}.
 
 % This function is called by a gen_server process when a time-out occurs or 
